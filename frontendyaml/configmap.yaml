@@ -11,188 +11,736 @@ data:
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>My App</title>
+      <meta charset="UTF-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>QUAD_CART — Built by Praveen Bharati</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com"/>
+      <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-          --bg: #0a0a0f;
-          --surface: #13131a;
-          --border: #1e1e2e;
-          --accent: #6c63ff;
-          --accent2: #ff6584;
-          --text: #e8e8f0;
-          --muted: #6b6b80;
+          --bg:       #020207;
+          --bg2:      #08080f;
+          --bg3:      #0e0e1a;
+          --surface:  #111120;
+          --border:   rgba(255,255,255,0.06);
+          --border2:  rgba(255,255,255,0.12);
+          --accent:   #00f0ff;
+          --accent2:  #7000ff;
+          --pink:     #ff2d78;
+          --green:    #00ff8c;
+          --amber:    #ffb800;
+          --text:     #e2e2f0;
+          --muted:    #555570;
+          --mono:     'JetBrains Mono', monospace;
+          --sans:     'Outfit', sans-serif;
         }
 
-        body {
+        html, body {
           background: var(--bg);
           color: var(--text);
-          font-family: 'DM Sans', sans-serif;
+          font-family: var(--sans);
           min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
+          overflow-x: hidden;
         }
 
-        /* Animated background blobs */
-        .blob {
-          position: fixed;
-          border-radius: 50%;
-          filter: blur(80px);
-          opacity: 0.18;
-          animation: float 8s ease-in-out infinite;
+        /* === SCANLINE OVERLAY === */
+        body::after {
+          content: '';
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background: repeating-linear-gradient(
+            0deg, transparent, transparent 2px,
+            rgba(0,240,255,0.015) 2px, rgba(0,240,255,0.015) 4px
+          );
+        }
+
+        /* === GRID BG === */
+        body::before {
+          content: '';
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background-image:
+            linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+          background-size: 48px 48px;
+        }
+
+        /* === AMBIENT GLOWS === */
+        .glow { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(140px); }
+        .g1 { width: 800px; height: 800px; background: var(--accent2); top: -300px; left: -200px; opacity: 0.1; }
+        .g2 { width: 600px; height: 600px; background: var(--accent); bottom: -200px; right: -100px; opacity: 0.07; }
+        .g3 { width: 400px; height: 400px; background: var(--pink); top: 40%; left: 40%; opacity: 0.05; }
+
+        /* === PAGE LAYOUT === */
+        .page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 28px 100px; }
+
+        /* === NAV === */
+        nav {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 24px 0; border-bottom: 1px solid var(--border);
+          margin-bottom: 72px;
+        }
+        .logo {
+          font-family: var(--mono); font-size: 20px; font-weight: 700;
+          letter-spacing: 0.05em; display: flex; align-items: center; gap: 2px;
+        }
+        .logo-quad { color: var(--accent); text-shadow: 0 0 20px rgba(0,240,255,0.6); }
+        .logo-under { color: var(--muted); }
+        .logo-cart { color: var(--text); }
+
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .nav-pill {
+          font-family: var(--mono); font-size: 11px; padding: 5px 12px;
+          border-radius: 6px; display: flex; align-items: center; gap: 7px;
+        }
+        .nav-pill.live {
+          background: rgba(0,255,140,0.06); border: 1px solid rgba(0,255,140,0.2);
+          color: var(--green);
+        }
+        .nav-pill.live::before {
+          content: ''; width: 6px; height: 6px; border-radius: 50%;
+          background: var(--green); box-shadow: 0 0 10px var(--green);
+          animation: pulse 1.8s ease-in-out infinite;
+        }
+        .nav-pill.argo {
+          background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.2);
+          color: var(--accent);
+        }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }
+
+        /* === HERO === */
+        .hero { margin-bottom: 80px; }
+        .hero-tag {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
+          text-transform: uppercase; color: var(--accent);
+          border: 1px solid rgba(0,240,255,0.2); padding: 5px 14px;
+          border-radius: 4px; margin-bottom: 32px;
+          background: rgba(0,240,255,0.04);
+        }
+        .hero-tag::before { content:'▶'; font-size:8px; }
+
+        .hero h1 {
+          font-size: clamp(3.5rem, 8vw, 7rem);
+          font-weight: 900; line-height: 0.95; letter-spacing: -3px;
+          margin-bottom: 28px;
+        }
+        .h1-q {
+          display: block;
+          color: var(--accent);
+          text-shadow: 0 0 60px rgba(0,240,255,0.4), 0 0 120px rgba(0,240,255,0.15);
+        }
+        .h1-uad { display: block; color: #fff; }
+        .h1-cart {
+          display: block;
+          -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+          color: transparent;
+        }
+
+        .hero-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+        .hero-left { flex: 1; min-width: 280px; }
+        .hero-desc {
+          font-size: 16px; color: var(--muted); line-height: 1.8; max-width: 480px;
+          margin-bottom: 32px;
+        }
+        .hero-desc strong { color: var(--text); font-weight: 500; }
+        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-cyber {
+          font-family: var(--mono); font-size: 12px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          padding: 12px 28px; border-radius: 6px; cursor: pointer;
+          transition: all 0.15s;
+        }
+        .btn-cyber.primary {
+          background: var(--accent); color: #000; border: none;
+          box-shadow: 0 0 30px rgba(0,240,255,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .btn-cyber.primary:hover { box-shadow: 0 0 60px rgba(0,240,255,0.6); transform: translateY(-1px); }
+        .btn-cyber.ghost {
+          background: transparent; color: var(--text);
+          border: 1px solid var(--border2);
+        }
+        .btn-cyber.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Terminal box */
+        .hero-terminal {
+          background: var(--bg2); border: 1px solid var(--border2);
+          border-radius: 12px; padding: 20px 22px; flex-shrink: 0;
+          width: 320px; font-family: var(--mono); font-size: 12px;
+        }
+        .term-bar {
+          display: flex; align-items: center; gap: 7px; margin-bottom: 16px;
+          padding-bottom: 12px; border-bottom: 1px solid var(--border);
+        }
+        .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .term-title { font-size: 11px; color: var(--muted); margin-left: auto; }
+        .term-line { margin: 4px 0; line-height: 1.7; }
+        .t-dim   { color: var(--muted); }
+        .t-green { color: var(--green); }
+        .t-cyan  { color: var(--accent); }
+        .t-white { color: var(--text); }
+        .t-pink  { color: var(--pink); }
+        .cursor { display: inline-block; width: 8px; height: 14px; background: var(--accent); vertical-align: middle; animation: blink2 1s step-end infinite; }
+        @keyframes blink2 { 50% { opacity: 0; } }
+
+        /* === STATS === */
+        .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 72px; }
+        .stat {
+          background: var(--bg3); border: 1px solid var(--border);
+          border-radius: 12px; padding: 22px 18px; position: relative; overflow: hidden;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+        .stat::before {
+          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, var(--accent), transparent);
+          opacity: 0.4;
+        }
+        .stat:hover { border-color: rgba(0,240,255,0.25); transform: translateY(-2px); }
+        .stat-lbl { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+        .stat-val { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: #fff; }
+        .stat-sub { font-family: var(--mono); font-size: 10px; color: var(--green); margin-top: 6px; }
+
+        /* === SECTION HEADERS === */
+        .sh { margin-bottom: 28px; }
+        .sh-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .sh-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+        /* === PRODUCTS === */
+        .products-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 72px; }
+        .pc {
+          background: var(--bg3); border: 1px solid var(--border);
+          border-radius: 16px; overflow: hidden; cursor: pointer;
+          transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+          position: relative;
+        }
+        .pc::after {
+          content: ''; position: absolute; inset: 0; border-radius: 16px;
+          background: linear-gradient(135deg, rgba(0,240,255,0.04), transparent 60%);
           pointer-events: none;
         }
-        .blob1 { width: 500px; height: 500px; background: var(--accent); top: -150px; left: -100px; animation-delay: 0s; }
-        .blob2 { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; right: -80px; animation-delay: 3s; }
-        .blob3 { width: 300px; height: 300px; background: #43e8d8; top: 50%; left: 50%; animation-delay: 5s; }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-30px) scale(1.05); }
+        .pc:hover {
+          border-color: rgba(0,240,255,0.35);
+          transform: translateY(-5px);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,240,255,0.08);
         }
-
-        /* Card */
-        .card {
-          position: relative;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 24px;
-          padding: 56px 64px;
-          max-width: 640px;
-          width: 90%;
-          text-align: center;
-          backdrop-filter: blur(20px);
-          box-shadow: 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-          animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        .pc-img {
+          height: 160px; display: flex; align-items: center; justify-content: center;
+          font-size: 56px; position: relative; overflow: hidden;
         }
-
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(40px); }
-          to   { opacity: 1; transform: translateY(0); }
+        .pc-img-inner { position: absolute; inset: 0; }
+        .pc-img span { position: relative; z-index: 1; filter: drop-shadow(0 0 20px rgba(0,240,255,0.4)); }
+        .pc-body { padding: 16px; }
+        .pc-cat { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 5px; color: var(--accent); }
+        .pc-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .pc-desc { font-size: 11px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+        .pc-foot { display: flex; align-items: center; justify-content: space-between; }
+        .pc-price { font-family: var(--mono); font-size: 16px; font-weight: 700; color: #fff; }
+        .pc-price small { font-size: 10px; color: var(--muted); font-weight: 400; }
+        .pc-add {
+          width: 30px; height: 30px; border-radius: 7px; font-size: 16px;
+          background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25);
+          color: var(--accent); display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.15s;
         }
+        .pc-add:hover { background: var(--accent); color: #000; transform: scale(1.1); box-shadow: 0 0 16px rgba(0,240,255,0.5); }
 
+        /* === PIPELINE === */
+        .pipeline-wrap { margin-bottom: 72px; }
+        .pipeline-box {
+          background: var(--bg3); border: 1px solid var(--border);
+          border-radius: 16px; padding: 28px 28px 32px; position: relative; overflow: hidden;
+        }
+        .pipeline-box::before {
+          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+          background: linear-gradient(90deg, var(--accent2), var(--accent), var(--green));
+        }
+        .pipe-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .pipe-top-left { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+        .pipe-top-left strong { color: var(--accent); }
+        .synced-badge {
+          font-family: var(--mono); font-size: 10px; display: flex; align-items: center; gap: 7px;
+          background: rgba(0,255,140,0.07); border: 1px solid rgba(0,255,140,0.2);
+          color: var(--green); padding: 5px 12px; border-radius: 6px;
+        }
+        .synced-badge::before { content:''; width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite; }
+
+        .steps { display: flex; align-items: center; overflow-x: auto; padding-bottom: 4px; }
+        .step-node { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .step-box {
+          width: 56px; height: 56px; border-radius: 14px; font-size: 24px;
+          display: flex; align-items: center; justify-content: center;
+          background: var(--bg2); border: 1px solid var(--border2); margin-bottom: 10px;
+          position: relative; transition: border-color 0.2s;
+        }
+        .step-box.done {
+          border-color: rgba(0,240,255,0.4);
+          box-shadow: 0 0 20px rgba(0,240,255,0.12), inset 0 0 20px rgba(0,240,255,0.04);
+        }
+        .step-box.done::after {
+          content: '✓'; position: absolute; top: -7px; right: -7px;
+          width: 16px; height: 16px; background: var(--green); border-radius: 50%;
+          font-size: 9px; font-weight: 900; color: #000;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .step-name { font-size: 11px; font-weight: 600; color: var(--text); text-align: center; }
+        .step-meta { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 2px; text-align: center; }
+        .step-wire {
+          flex: 1; height: 2px; background: var(--border2); min-width: 24px;
+          position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .step-wire-flow {
+          position: absolute; inset: 0;
+          background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+          animation: wireflow 2s linear infinite;
+        }
+        @keyframes wireflow { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+
+        /* === INFRA GRID === */
+        .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 72px; }
+        .ic {
+          background: var(--bg3); border: 1px solid var(--border);
+          border-radius: 16px; padding: 22px;
+        }
+        .ic-head {
+          font-family: var(--mono); font-size: 10px; color: var(--muted);
+          text-transform: uppercase; letter-spacing: 0.12em;
+          margin-bottom: 18px; display: flex; align-items: center; gap: 7px;
+        }
+        .ic-head::before { content: ''; width: 3px; height: 12px; border-radius: 2px; background: var(--accent); }
+
+        .app-row {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 9px 11px; border-radius: 9px; margin-bottom: 7px;
+          background: var(--bg2); border: 1px solid var(--border);
+          transition: border-color 0.2s;
+        }
+        .app-row:hover { border-color: var(--border2); }
+        .app-row-l { display: flex; align-items: center; gap: 10px; }
+        .app-ico { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .app-n { font-size: 13px; font-weight: 600; }
+        .app-ns { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 1px; }
+        .app-badges { display: flex; gap: 5px; }
         .badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: rgba(108,99,255,0.12);
-          border: 1px solid rgba(108,99,255,0.3);
-          color: var(--accent);
-          font-size: 12px;
-          font-weight: 500;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          padding: 6px 14px;
-          border-radius: 999px;
-          margin-bottom: 28px;
-          animation: slideUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+          font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 3px 7px;
+          border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge.h { background: rgba(0,255,140,0.1); color: var(--green); border: 1px solid rgba(0,255,140,0.2); }
+        .badge.s { background: rgba(0,240,255,0.1); color: var(--accent); border: 1px solid rgba(0,240,255,0.2); }
+
+        /* K8s nodes */
+        .nodes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+        .knode {
+          background: var(--bg2); border: 1px solid var(--border);
+          border-radius: 9px; padding: 11px 8px; text-align: center;
+        }
+        .knode-name { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-bottom: 5px; }
+        .knode-status { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green); }
+        .knode-cpu { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 3px; }
+        .knode-bar { height: 3px; background: var(--border2); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .knode-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+        .pods-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pod-tag {
+          font-family: var(--mono); font-size: 9px; padding: 3px 8px; border-radius: 4px;
+          background: rgba(0,255,140,0.07); border: 1px solid rgba(0,255,140,0.18); color: var(--green);
         }
 
-        .badge::before {
-          content: '';
-          width: 6px; height: 6px;
-          background: var(--accent);
-          border-radius: 50%;
-          box-shadow: 0 0 6px var(--accent);
-          animation: pulse 2s infinite;
+        /* === BUILT BY === */
+        .built-by {
+          border-top: 1px solid var(--border); padding-top: 64px; text-align: center;
         }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
+        .by-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 16px; }
+        .by-name {
+          font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900;
+          letter-spacing: -2px; line-height: 1;
+          color: #fff;
+          text-shadow: 0 0 80px rgba(0,240,255,0.25);
+          margin-bottom: 10px;
         }
-
-        h1 {
-          font-family: 'Syne', sans-serif;
-          font-size: clamp(2rem, 5vw, 3rem);
-          font-weight: 800;
-          line-height: 1.1;
-          margin-bottom: 16px;
-          background: linear-gradient(135deg, #fff 0%, var(--muted) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: slideUp 0.7s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+        .by-name span { color: var(--accent); text-shadow: 0 0 40px rgba(0,240,255,0.6); }
+        .by-role { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 28px; letter-spacing: 0.05em; }
+        .tech-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .tech {
+          font-family: var(--mono); font-size: 10px; padding: 5px 12px; border-radius: 5px;
+          background: rgba(255,255,255,0.03); border: 1px solid var(--border2); color: var(--muted);
+          transition: all 0.2s; cursor: default;
         }
+        .tech:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,240,255,0.05); }
 
-        p {
-          color: var(--muted);
-          font-size: 16px;
-          line-height: 1.7;
-          margin-bottom: 40px;
-          animation: slideUp 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        /* === FADE UP ANIMATION === */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:none; } }
+        .fu  { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+        .d1  { animation-delay: 0.05s; }
+        .d2  { animation-delay: 0.15s; }
+        .d3  { animation-delay: 0.25s; }
+        .d4  { animation-delay: 0.35s; }
+        .d5  { animation-delay: 0.45s; }
+
+        /* === RESPONSIVE === */
+        @media(max-width:768px) {
+          .stats-row { grid-template-columns: repeat(2,1fr); }
+          .products-grid { grid-template-columns: repeat(2,1fr); }
+          .infra-grid { grid-template-columns: 1fr; }
+          .hero-terminal { width: 100%; }
         }
-
-        .services {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          margin-bottom: 40px;
-          animation: slideUp 0.7s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+        @media(max-width:480px) {
+          .products-grid { grid-template-columns: 1fr; }
         }
-
-        .service-chip {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 14px 10px;
-          font-size: 13px;
-          color: var(--text);
-          transition: border-color 0.2s, background 0.2s;
-          cursor: default;
-        }
-
-        .service-chip:hover {
-          border-color: rgba(108,99,255,0.4);
-          background: rgba(108,99,255,0.06);
-        }
-
-        .service-chip .icon { font-size: 20px; display: block; margin-bottom: 6px; }
-
-        .status-bar {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          color: var(--muted);
-          font-size: 13px;
-          animation: slideUp 0.7s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite; }
       </style>
     </head>
     <body>
-      <div class="blob blob1"></div>
-      <div class="blob blob2"></div>
-      <div class="blob blob3"></div>
+      <div class="glow g1"></div>
+      <div class="glow g2"></div>
+      <div class="glow g3"></div>
 
-      <div class="card">
-        <div class="badge">Deployed via ArgoCD</div>
-        <h1>My App is Live 🚀</h1>
-        <p>Your frontend is running on Kubernetes.<br/>All microservices are connected and healthy.</p>
+      <div class="page">
 
-        <div class="services">
-          <div class="service-chip"><span class="icon">⚙️</span>Service A</div>
-          <div class="service-chip"><span class="icon">🗄️</span>Service B</div>
-          <div class="service-chip"><span class="icon">📡</span>Service C</div>
-          <div class="service-chip"><span class="icon">🔐</span>Auth</div>
-          <div class="service-chip"><span class="icon">📨</span>Gateway</div>
-          <div class="service-chip"><span class="icon">📊</span>Metrics</div>
+        <!-- NAV -->
+        <nav class="fu">
+          <div class="logo">
+            <span class="logo-quad">QUAD</span><span class="logo-under">_</span><span class="logo-cart">CART</span>
+          </div>
+          <div class="nav-right">
+            <div class="nav-pill live">K8s · Live</div>
+            <div class="nav-pill argo">ArgoCD · Synced</div>
+          </div>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero fu d1">
+          <div class="hero-tag">GitOps · Kubernetes · Kind Cluster · nginx:alpine</div>
+          <div class="hero-row">
+            <div class="hero-left">
+              <h1>
+                <span class="h1-q">Q</span>
+                <span class="h1-uad">UAD</span>
+                <span class="h1-cart">_CART</span>
+              </h1>
+              <p class="hero-desc">
+                A <strong>production-grade</strong> e-commerce platform deployed on
+                <strong>Kubernetes</strong> using pure <strong>GitOps</strong>.
+                Zero custom images. Every commit auto-synced via <strong>ArgoCD</strong>.
+                No downtime. Ever.
+              </p>
+              <div class="hero-btns">
+                <button class="btn-cyber primary">EXPLORE STORE</button>
+                <button class="btn-cyber ghost">VIEW PIPELINE →</button>
+              </div>
+            </div>
+
+            <!-- TERMINAL -->
+            <div class="hero-terminal">
+              <div class="term-bar">
+                <div class="term-dot" style="background:#ff5f57"></div>
+                <div class="term-dot" style="background:#febc2e"></div>
+                <div class="term-dot" style="background:#28c840"></div>
+                <span class="term-title">argocd · production</span>
+              </div>
+              <div class="term-line"><span class="t-dim">$</span> <span class="t-cyan">kubectl</span> <span class="t-white">get pods -n production</span></div>
+              <div class="term-line" style="margin-top:8px">
+                <span class="t-green">✔</span> <span class="t-white">frontend</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-green">Running</span>
+              </div>
+              <div class="term-line"><span class="t-green">✔</span> <span class="t-white">auth-service</span>&nbsp;&nbsp;&nbsp;<span class="t-green">Running</span></div>
+              <div class="term-line"><span class="t-green">✔</span> <span class="t-white">order-service</span>&nbsp;&nbsp;<span class="t-green">Running</span></div>
+              <div class="term-line"><span class="t-green">✔</span> <span class="t-white">cart-service</span>&nbsp;&nbsp;&nbsp;<span class="t-green">Running</span></div>
+              <div class="term-line"><span class="t-green">✔</span> <span class="t-white">payment-svc</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-green">Running</span></div>
+              <div class="term-line" style="margin-top:10px">
+                <span class="t-dim">$</span> <span class="t-cyan">argocd</span> <span class="t-white">app get frontend</span>
+              </div>
+              <div class="term-line"><span class="t-dim">Health:</span> <span class="t-green">Healthy</span></div>
+              <div class="term-line"><span class="t-dim">Sync:</span>&nbsp;&nbsp;<span class="t-cyan">Synced · 1m ago</span></div>
+              <div class="term-line" style="margin-top:10px"><span class="t-dim">$</span> <span class="cursor"></span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STATS -->
+        <div class="stats-row fu d2">
+          <div class="stat">
+            <div class="stat-lbl">Total Orders</div>
+            <div class="stat-val">2.1M</div>
+            <div class="stat-sub">↑ 24% this month</div>
+          </div>
+          <div class="stat">
+            <div class="stat-lbl">Uptime SLA</div>
+            <div class="stat-val">99.99%</div>
+            <div class="stat-sub">↑ GitOps zero-drift</div>
+          </div>
+          <div class="stat">
+            <div class="stat-lbl">Auto-Syncs</div>
+            <div class="stat-val">1,204</div>
+            <div class="stat-sub">↑ 18 today · ArgoCD</div>
+          </div>
+          <div class="stat">
+            <div class="stat-lbl">Microservices</div>
+            <div class="stat-val">16</div>
+            <div class="stat-sub">↑ All healthy · K8s</div>
+          </div>
         </div>
 
-        <div class="status-bar">
-          <span class="dot"></span>
-          All systems operational
+        <!-- PRODUCTS -->
+        <div class="sh fu d3">
+          <div class="sh-title">Featured Products</div>
+          <div class="sh-sub">// served via nginx:alpine · html mounted from ConfigMap · no Docker build needed</div>
         </div>
+        <div class="products-grid fu d3">
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#0d001a,#1a0033,#0d0026)"></div>
+              <span>⌚</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Wearables</div>
+              <div class="pc-name">ProWatch Ultra X</div>
+              <div class="pc-desc">AMOLED · Always-on GPS · 7-day battery · IP68</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹24,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#001a1a,#003333,#001a26)"></div>
+              <span>💻</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Laptops</div>
+              <div class="pc-name">QuadBook Pro 16</div>
+              <div class="pc-desc">M3 Max · 32GB · 1TB SSD · ProMotion 120Hz</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹1,49,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#1a0a00,#2d1500,#1a0a0d)"></div>
+              <span>🎧</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Audio</div>
+              <div class="pc-name">SoundDome ANC Pro</div>
+              <div class="pc-desc">40dB noise cancel · Hi-Res Audio · 36hr battery</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹8,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#001a08,#002d10,#00150d)"></div>
+              <span>📱</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Smartphones</div>
+              <div class="pc-name">QuadPhone 15 Ultra</div>
+              <div class="pc-desc">200MP · Snapdragon 8 Gen 3 · 5500mAh · 165Hz</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹84,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#0d1a00,#1a2d00,#0d1a0a)"></div>
+              <span>🖥️</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Monitors</div>
+              <div class="pc-name">ViewMax 4K 32"</div>
+              <div class="pc-desc">4K OLED · 240Hz · HDR1000 · USB-C 140W PD</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹54,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc">
+            <div class="pc-img">
+              <div class="pc-img-inner" style="background:linear-gradient(135deg,#00001a,#00002d,#00001a)"></div>
+              <span>🤖</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-cat">Smart Home</div>
+              <div class="pc-name">QuadHub AI 4.0</div>
+              <div class="pc-desc">Matter protocol · 256-device control · edge AI</div>
+              <div class="pc-foot">
+                <div class="pc-price">₹14,999 <small>/unit</small></div>
+                <button class="pc-add">+</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PIPELINE -->
+        <div class="pipeline-wrap fu d4">
+          <div class="sh">
+            <div class="sh-title">GitOps Deployment Pipeline</div>
+            <div class="sh-sub">// push to main → argocd detects → k8s applies → live. zero manual steps.</div>
+          </div>
+          <div class="pipeline-box">
+            <div class="pipe-top">
+              <div class="pipe-top-left"><strong>quad-cart</strong> / production / frontend</div>
+              <div class="synced-badge">Synced · 1m ago</div>
+            </div>
+            <div class="steps">
+              <div class="step-node">
+                <div class="step-box done">💻</div>
+                <div class="step-name">Code Push</div>
+                <div class="step-meta">git push</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow"></div></div>
+              <div class="step-node">
+                <div class="step-box done">🔧</div>
+                <div class="step-name">CI Build</div>
+                <div class="step-meta">GitHub Actions</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow" style="animation-delay:0.3s"></div></div>
+              <div class="step-node">
+                <div class="step-box done">📄</div>
+                <div class="step-name">Update Manifest</div>
+                <div class="step-meta">configmap.yaml</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow" style="animation-delay:0.6s"></div></div>
+              <div class="step-node">
+                <div class="step-box done">🐙</div>
+                <div class="step-name">Git Repo</div>
+                <div class="step-meta">k8s-manifests</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow" style="animation-delay:0.9s"></div></div>
+              <div class="step-node">
+                <div class="step-box done">🔄</div>
+                <div class="step-name">ArgoCD Sync</div>
+                <div class="step-meta">auto-detect</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow" style="animation-delay:1.2s"></div></div>
+              <div class="step-node">
+                <div class="step-box done">☸️</div>
+                <div class="step-name">K8s Apply</div>
+                <div class="step-meta">Kind cluster</div>
+              </div>
+              <div class="step-wire"><div class="step-wire-flow" style="animation-delay:1.5s"></div></div>
+              <div class="step-node">
+                <div class="step-box done">🚀</div>
+                <div class="step-name">Live!</div>
+                <div class="step-meta">port-forward</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INFRA -->
+        <div class="infra-grid fu d4">
+          <!-- ArgoCD -->
+          <div class="ic">
+            <div class="ic-head">ArgoCD Applications</div>
+            <div class="app-row">
+              <div class="app-row-l">
+                <div class="app-ico" style="background:rgba(0,240,255,0.1)">🛒</div>
+                <div><div class="app-n">frontend</div><div class="app-ns">production · NodePort :30080</div></div>
+              </div>
+              <div class="app-badges"><span class="badge h">Healthy</span><span class="badge s">Synced</span></div>
+            </div>
+            <div class="app-row">
+              <div class="app-row-l">
+                <div class="app-ico" style="background:rgba(0,255,140,0.1)">🔐</div>
+                <div><div class="app-n">auth-service</div><div class="app-ns">production</div></div>
+              </div>
+              <div class="app-badges"><span class="badge h">Healthy</span><span class="badge s">Synced</span></div>
+            </div>
+            <div class="app-row">
+              <div class="app-row-l">
+                <div class="app-ico" style="background:rgba(112,0,255,0.15)">📦</div>
+                <div><div class="app-n">order-service</div><div class="app-ns">production</div></div>
+              </div>
+              <div class="app-badges"><span class="badge h">Healthy</span><span class="badge s">Synced</span></div>
+            </div>
+            <div class="app-row">
+              <div class="app-row-l">
+                <div class="app-ico" style="background:rgba(255,184,0,0.1)">💳</div>
+                <div><div class="app-n">payment-service</div><div class="app-ns">production</div></div>
+              </div>
+              <div class="app-badges"><span class="badge h">Healthy</span><span class="badge s">Synced</span></div>
+            </div>
+            <div class="app-row">
+              <div class="app-row-l">
+                <div class="app-ico" style="background:rgba(255,45,120,0.1)">🛍️</div>
+                <div><div class="app-n">cart-service</div><div class="app-ns">production</div></div>
+              </div>
+              <div class="app-badges"><span class="badge h">Healthy</span><span class="badge s">Synced</span></div>
+            </div>
+          </div>
+
+          <!-- K8s nodes -->
+          <div class="ic">
+            <div class="ic-head">Kind Cluster — Nodes</div>
+            <div class="nodes-grid">
+              <div class="knode">
+                <div class="knode-name">control-plane</div>
+                <div class="knode-status">● Ready</div>
+                <div class="knode-cpu">CPU 29%</div>
+                <div class="knode-bar"><div class="knode-fill" style="width:29%"></div></div>
+              </div>
+              <div class="knode">
+                <div class="knode-name">worker-01</div>
+                <div class="knode-status">● Ready</div>
+                <div class="knode-cpu">CPU 44%</div>
+                <div class="knode-bar"><div class="knode-fill" style="width:44%"></div></div>
+              </div>
+              <div class="knode">
+                <div class="knode-name">worker-02</div>
+                <div class="knode-status">● Ready</div>
+                <div class="knode-cpu">CPU 37%</div>
+                <div class="knode-bar"><div class="knode-fill" style="width:37%"></div></div>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:14px">
+              <div class="ic-head" style="margin-bottom:10px">Running Pods</div>
+              <div class="pods-row">
+                <span class="pod-tag">frontend ✓</span>
+                <span class="pod-tag">auth ✓</span>
+                <span class="pod-tag">orders ✓</span>
+                <span class="pod-tag">cart ✓</span>
+                <span class="pod-tag">payments ✓</span>
+                <span class="pod-tag">nginx ✓</span>
+                <span class="pod-tag">configmap ✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUILT BY -->
+        <div class="built-by fu d5">
+          <div class="by-label">// Engineered by</div>
+          <div class="by-name">Praveen <span>Bharati</span></div>
+          <div class="by-role">DevOps Engineer · GitOps · Kubernetes · ArgoCD · Kind</div>
+          <div class="tech-row">
+            <span class="tech">Kubernetes</span>
+            <span class="tech">ArgoCD</span>
+            <span class="tech">GitOps</span>
+            <span class="tech">Kind Cluster</span>
+            <span class="tech">nginx:alpine</span>
+            <span class="tech">ConfigMap</span>
+            <span class="tech">NodePort</span>
+            <span class="tech">YAML</span>
+            <span class="tech">Zero-Downtime</span>
+            <span class="tech">Auto-Sync</span>
+            <span class="tech">Helm-free</span>
+            <span class="tech">Self-Heal</span>
+          </div>
+        </div>
+
       </div>
     </body>
     </html>
