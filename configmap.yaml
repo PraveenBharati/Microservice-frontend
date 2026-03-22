@@ -1,0 +1,198 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-html
+  namespace: production
+  labels:
+    app: frontend
+    component: ui
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>My App</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --bg: #0a0a0f;
+          --surface: #13131a;
+          --border: #1e1e2e;
+          --accent: #6c63ff;
+          --accent2: #ff6584;
+          --text: #e8e8f0;
+          --muted: #6b6b80;
+        }
+
+        body {
+          background: var(--bg);
+          color: var(--text);
+          font-family: 'DM Sans', sans-serif;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        /* Animated background blobs */
+        .blob {
+          position: fixed;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.18;
+          animation: float 8s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .blob1 { width: 500px; height: 500px; background: var(--accent); top: -150px; left: -100px; animation-delay: 0s; }
+        .blob2 { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; right: -80px; animation-delay: 3s; }
+        .blob3 { width: 300px; height: 300px; background: #43e8d8; top: 50%; left: 50%; animation-delay: 5s; }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        /* Card */
+        .card {
+          position: relative;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 24px;
+          padding: 56px 64px;
+          max-width: 640px;
+          width: 90%;
+          text-align: center;
+          backdrop-filter: blur(20px);
+          box-shadow: 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+          animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(108,99,255,0.12);
+          border: 1px solid rgba(108,99,255,0.3);
+          color: var(--accent);
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 6px 14px;
+          border-radius: 999px;
+          margin-bottom: 28px;
+          animation: slideUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .badge::before {
+          content: '';
+          width: 6px; height: 6px;
+          background: var(--accent);
+          border-radius: 50%;
+          box-shadow: 0 0 6px var(--accent);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+
+        h1 {
+          font-family: 'Syne', sans-serif;
+          font-size: clamp(2rem, 5vw, 3rem);
+          font-weight: 800;
+          line-height: 1.1;
+          margin-bottom: 16px;
+          background: linear-gradient(135deg, #fff 0%, var(--muted) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: slideUp 0.7s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        p {
+          color: var(--muted);
+          font-size: 16px;
+          line-height: 1.7;
+          margin-bottom: 40px;
+          animation: slideUp 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .services {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-bottom: 40px;
+          animation: slideUp 0.7s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .service-chip {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 14px 10px;
+          font-size: 13px;
+          color: var(--text);
+          transition: border-color 0.2s, background 0.2s;
+          cursor: default;
+        }
+
+        .service-chip:hover {
+          border-color: rgba(108,99,255,0.4);
+          background: rgba(108,99,255,0.06);
+        }
+
+        .service-chip .icon { font-size: 20px; display: block; margin-bottom: 6px; }
+
+        .status-bar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          color: var(--muted);
+          font-size: 13px;
+          animation: slideUp 0.7s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite; }
+      </style>
+    </head>
+    <body>
+      <div class="blob blob1"></div>
+      <div class="blob blob2"></div>
+      <div class="blob blob3"></div>
+
+      <div class="card">
+        <div class="badge">Deployed via ArgoCD</div>
+        <h1>My App is Live 🚀</h1>
+        <p>Your frontend is running on Kubernetes.<br/>All microservices are connected and healthy.</p>
+
+        <div class="services">
+          <div class="service-chip"><span class="icon">⚙️</span>Service A</div>
+          <div class="service-chip"><span class="icon">🗄️</span>Service B</div>
+          <div class="service-chip"><span class="icon">📡</span>Service C</div>
+          <div class="service-chip"><span class="icon">🔐</span>Auth</div>
+          <div class="service-chip"><span class="icon">📨</span>Gateway</div>
+          <div class="service-chip"><span class="icon">📊</span>Metrics</div>
+        </div>
+
+        <div class="status-bar">
+          <span class="dot"></span>
+          All systems operational
+        </div>
+      </div>
+    </body>
+    </html>
