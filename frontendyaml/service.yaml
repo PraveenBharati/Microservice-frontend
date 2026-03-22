@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: production
+  labels:
+    app: frontend
+    component: ui
+spec:
+  selector:
+    app: frontend
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080        # 🔁 Change this port if needed (range: 30000–32767)
+      protocol: TCP
