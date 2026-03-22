@@ -14,5 +14,5 @@ spec:
     - name: http
       port: 80
       targetPort: 80
-      nodePort: 30080        # 🔁 Change this port if needed (range: 30000–32767)
+      nodePort: 30099       # 🔁 Change this port if needed (range: 30000–32767)
       protocol: TCP
